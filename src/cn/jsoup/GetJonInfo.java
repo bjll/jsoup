@@ -17,7 +17,7 @@ import org.jsoup.select.Elements;
  */
 public class GetJonInfo {
     private String url="http://sou.zhaopin.com/jobs/searchresult.ashx?jl=";  //智联招聘网站
-    private  String city="西安"; //搜索工作的城市
+    private  String city="北京"; //搜索工作的城市
     private  String keywords="java";  //搜索工作的关键字
     public GetJonInfo(String city,String keywords){
         this.city=city;
@@ -26,8 +26,11 @@ public class GetJonInfo {
  
     public void getZhiLianWork(){
     	String resultStr="";//要写出的字符串
+    	long  benginTime=System.currentTimeMillis();
         try {
-            for (int i=0;i<100;i++) {
+        	BufferedWriter bWriter = new BufferedWriter( new OutputStreamWriter( new FileOutputStream("E:\\test.txt"),"utf-8"));
+        	int x=1;//PID
+            for (int i=0;i<300;i++) {
                 System.out.println("*********开始遍历第"+(i+1)+"页的求职信息*********");
                 Document doc = Jsoup.connect(url+city+"&kw="+keywords+"&p="+(i+1)+"&isadv=0").get();
                 Element content = doc.getElementById("newlist_list_content_table");
@@ -36,31 +39,28 @@ public class GetJonInfo {
                 Elements zwyxEls = content.getElementsByClass("zwyx");
                 Elements gzddEls = content.getElementsByClass("gzdd");
                 Elements gxsjEls = content.getElementsByClass("gxsj");
-                for(int j = 0;j<zwmcEls .size();j++){
+                for(int j = 1;j<zwmcEls .size();j++){
                     String jobName=zwmcEls.get(j).tagName("a").text();
                     String company=gsmcEls.get(j).tagName("a").text();
                     String salary=zwyxEls.get(j).tagName("a").text();
                     String place=gzddEls.get(j).tagName("a").text();
                     String date=gxsjEls.get(j).tagName("a").text();
-                    System.out.println(
-                    jobName+"\t"+company+"\t"+salary+"\t"+place+"\t"+date
-                            );
-                   resultStr+=jobName+"\t"+company+"\t"+salary+"\t"+place+"\n";
+                    resultStr+=jobName+"\t"+company+"\t"+salary+"\t"+place+"\t"+jobName+"\t"+company+"\t"+salary+"\t"+place+"\n";
+                  
                 }
                 System.out.println("*********结束遍历第"+(i+1)+"页的求职信息*********");
             }
         //将结果写出到文件
-            BufferedWriter bWriter = new BufferedWriter( new OutputStreamWriter(
-                            new FileOutputStream("E:\\test.txt"),"utf-8"));
             bWriter.write(resultStr);
-
+         System.err.println(System.currentTimeMillis()-benginTime);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
     public static void main(String[] args) {
-    	GetJonInfo jHtml = new GetJonInfo("上海", "java");
+        GetJonInfo jHtml = new GetJonInfo("北京", "java");
         jHtml.getZhiLianWork();
+    	
     }
 }
